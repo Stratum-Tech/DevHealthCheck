@@ -1,6 +1,6 @@
 # Stratum DevHealthCheck
 
-A Magento 2 CLI module that runs a colour-coded, sectioned health check of your environment and deployment configuration.
+A Magento 2 CLI module that runs a colour-coded, sectioned health check of your environment and deployment configuration, and scores overall system health on a 0–100 scale.
 
 ```
 ╔════════════════════════════════════════╗
@@ -59,14 +59,14 @@ A Magento 2 CLI module that runs a colour-coded, sectioned health check of your 
     ✓  .git in Webroot       .git/ not inside pub/
     ✓  PHP Info Files        no phpinfo files found in pub/
     ✗  Two-Factor Auth       Magento_TwoFactorAuth is disabled
-    ℹ  Webroot Location      cannot verify from CLI — ensure document root is set to pub/
+    –  Webroot Location      document root not available from CLI
     ✓  Log Dir Exposure      var/log and var/report outside pub/
 
 [Performance]
     –  Asset Minification    minification check only relevant in production
     ⚠  Flat Catalog          flat tables disabled for: products, categories
     ✓  Module Count          142 enabled modules
-    ✓  MySQL Query Cache     query cache removed in MySQL 8 (no action needed)
+    ✓  MySQL Query Cache      query cache removed in MySQL 8 (no action needed)
     ✓  Full Page Cache       Varnish
 
 [Logging]
@@ -79,7 +79,7 @@ A Magento 2 CLI module that runs a colour-coded, sectioned health check of your 
     ✓  Var Directory Size    0.8GB
 
 [Config Integrity]
-    ✓  config.php Sync       all 142 modules accounted for
+    ✓  config.php Sync       all 142 modules present in config.php
     ✓  Store Code in URL     disabled
 
 [Extensions]
@@ -91,7 +91,8 @@ A Magento 2 CLI module that runs a colour-coded, sectioned health check of your 
     ✓  Session Backend       Redis
 
 ────────────────────────────────────────────
-  Summary:  35 OK  |  4 WARN  |  1 FAIL  |  2 INFO  |  6 SKIP
+  Summary:  35 OK  |  4 WARN  |  1 FAIL  |  7 SKIP
+  Score:    82/100  Grade: B
 ────────────────────────────────────────────
 ```
 
@@ -143,6 +144,39 @@ bin/magento dev:healthcheck --fail-on-warn
 | `1` | One or more FAIL results |
 | `2` | One or more WARN results (only with `--fail-on-warn`) |
 
+## Scoring
+
+Every check contributes to a weighted 0–100 health score. Sections have different weights based on their impact on production stability and security:
+
+| Section | Weight |
+|---------|--------|
+| Security | 20 |
+| Database | 15 |
+| Cache | 10 |
+| Cron | 10 |
+| Deploy & Mode | 8 |
+| PHP | 8 |
+| Environment | 7 |
+| Filesystem | 7 |
+| Indexers | 5 |
+| Search | 5 |
+| Infrastructure | 5 |
+| Performance | 4 |
+| Logging | 3 |
+| Config Integrity | 3 |
+| Extensions | 3 |
+| Storage | 2 |
+
+Points are split equally among checks within each section. SKIP checks are excluded entirely and do not affect the score. WARN results earn 50% of their available points; FAIL earns 0%.
+
+| Grade | Score |
+|-------|-------|
+| A | 90–100 |
+| B | 75–89 |
+| C | 60–74 |
+| D | 45–59 |
+| F | 0–44 |
+
 ## Checks
 
 | Section | Check | What it verifies |
@@ -180,8 +214,8 @@ bin/magento dev:healthcheck --fail-on-warn
 | Security | .git in Webroot | FAIL if .git/ directory found inside pub/ |
 | Security | PHP Info Files | FAIL if info.php or phpinfo.php found in pub/ |
 | Security | Two-Factor Auth | FAIL if Magento_TwoFactorAuth disabled; WARN if no provider configured |
-| Security | Webroot Location | Verifies document root is pub/, not Magento root |
-| Security | Log Dir Exposure | Verifies var/log/ and var/report/ are outside pub/ |
+| Security | Webroot Location | Verifies pub/index.php exists and sensitive files are outside pub/; skipped from CLI |
+| Security | Log Dir Exposure | Verifies var/log/ and var/report/ are outside pub/ and protected by .htaccess |
 | Performance | Asset Minification | JS/CSS minification and merging enabled in production |
 | Performance | Flat Catalog | Flat product and category tables enabled |
 | Performance | Module Count | WARN >= 300 modules, FAIL >= 400 |
@@ -192,7 +226,7 @@ bin/magento dev:healthcheck --fail-on-warn
 | Logging | Debug Logging | Warns if dev/debug/debug_logging enabled in production |
 | Storage | Media Size | WARN >= 20GB, FAIL >= 50GB |
 | Storage | Var Directory Size | WARN >= 5GB, FAIL >= 20GB |
-| Config Integrity | config.php Sync | Detects modules registered but not yet in config.php |
+| Config Integrity | config.php Sync | Detects modules registered but absent from config.php; run `app:config:dump` to fix |
 | Config Integrity | Store Code in URL | Warns if web/url/use_store enabled (breaks Varnish/CDN) |
 | Extensions | Class Rewrites | Counts `<preference>` entries across all di.xml; WARN >= 20, FAIL >= 50 |
 | Extensions | Duplicate Modules | FAIL if same module name exists in both app/code/ and vendor/ |
