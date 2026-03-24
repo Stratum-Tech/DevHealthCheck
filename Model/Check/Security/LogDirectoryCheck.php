@@ -25,9 +25,9 @@ class LogDirectoryCheck implements CheckInterface
 
     public function run(): CheckResult
     {
-        $root    = $this->directoryList->getRoot();
-        $pubDir  = $this->directoryList->getPath('pub');
-        $varDir  = $this->directoryList->getPath('var');
+        $root   = $this->directoryList->getRoot();
+        $pubDir = $this->directoryList->getPath('pub');
+        $varDir = $this->directoryList->getPath('var');
 
         // var/ should not be inside pub/
         if (str_starts_with(realpath($varDir) ?: $varDir, realpath($pubDir) ?: $pubDir)) {
@@ -37,17 +37,34 @@ class LogDirectoryCheck implements CheckInterface
             );
         }
 
-        // Check for .htaccess protection on var/ in case webroot is Magento root
-        $exposed = [];
+        // If webroot is the Magento root (not pub/), check that var/log and var/report
+        // are protected by an .htaccess deny rule.
+        $rootHtaccess = $root . '/.htaccess';
+        $exposed      = [];
 
         foreach (['var/log', 'var/report'] as $dir) {
-            $path = $root . '/' . $dir;
-            if (is_dir($path) && !file_exists($path . '/.htaccess') && !file_exists($root . '/.htaccess')) {
+            $path         = $root . '/' . $dir;
+            $dirHtaccess  = $path . '/.htaccess';
+
+            if (!is_dir($path)) {
+                continue;
+            }
+
+            $protectedByRoot = file_exists($rootHtaccess)
+                && str_contains((string) file_get_contents($rootHtaccess), $dir);
+
+            if (!file_exists($dirHtaccess) && !$protectedByRoot) {
                 $exposed[] = $dir;
             }
         }
 
-        // If webroot is pub/, var/ is already protected — this is informational
+        if ($exposed !== []) {
+            return CheckResult::warn(
+                sprintf('%s may be web-accessible', implode(', ', $exposed)),
+                'Add .htaccess deny rules or set document root to pub/',
+            );
+        }
+
         return CheckResult::ok('var/log and var/report outside pub/');
     }
 }

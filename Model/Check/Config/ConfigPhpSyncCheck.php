@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Stratum\DevHealthCheck\Model\Check\Config;
 
+use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\Module\FullModuleList;
-use Magento\Framework\Module\ModuleListInterface;
 use Stratum\DevHealthCheck\Model\Check\CheckInterface;
 use Stratum\DevHealthCheck\Model\Result\CheckResult;
 
@@ -12,7 +12,7 @@ class ConfigPhpSyncCheck implements CheckInterface
 {
     public function __construct(
         private readonly FullModuleList $fullModuleList,
-        private readonly ModuleListInterface $enabledModuleList,
+        private readonly DeploymentConfig $deploymentConfig,
     ) {}
 
     public function getLabel(): string
@@ -27,24 +27,28 @@ class ConfigPhpSyncCheck implements CheckInterface
 
     public function run(): CheckResult
     {
-        $allModules     = array_keys($this->fullModuleList->getAll());
-        $enabledModules = array_keys($this->enabledModuleList->getAll());
+        $configModules = $this->deploymentConfig->get('modules');
 
-        // Modules that are registered but not in config.php (neither enabled nor explicitly disabled)
-        // These are modules installed after the last setup:upgrade --no-interaction run
-        $notInConfig = array_diff($allModules, $enabledModules);
-
-        // Filter out modules that are in full list but we expect them to be absent
-        // (This catch covers modules registered but not yet setup:upgrade'd)
-        if (count($notInConfig) > 0) {
+        if (!is_array($configModules)) {
             return CheckResult::warn(
-                sprintf('%d module(s) not in config.php', count($notInConfig)),
-                implode(', ', array_slice(array_values($notInConfig), 0, 5))
-                    . (count($notInConfig) > 5 ? '...' : '')
-                    . ' — run bin/magento setup:upgrade',
+                'config.php missing modules section',
+                'Run bin/magento app:config:dump to generate it',
             );
         }
 
-        return CheckResult::ok(sprintf('all %d modules accounted for', count($allModules)));
+        $allModules  = array_keys($this->fullModuleList->getAll());
+        $notInConfig = array_diff($allModules, array_keys($configModules));
+
+        if ($notInConfig !== []) {
+            $preview = implode(', ', array_slice(array_values($notInConfig), 0, 5));
+            $suffix  = count($notInConfig) > 5 ? '...' : '';
+
+            return CheckResult::warn(
+                sprintf('%d module(s) missing from config.php', count($notInConfig)),
+                $preview . $suffix . ' — run bin/magento app:config:dump',
+            );
+        }
+
+        return CheckResult::ok(sprintf('all %d modules present in config.php', count($allModules)));
     }
 }

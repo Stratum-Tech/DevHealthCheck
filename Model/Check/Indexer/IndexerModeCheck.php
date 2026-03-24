@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Stratum\DevHealthCheck\Model\Check\Indexer;
 
 use Magento\Framework\App\State;
-use Magento\Framework\Mview\View\StateInterface;
 use Magento\Indexer\Model\Indexer\CollectionFactory;
 use Stratum\DevHealthCheck\Model\Check\CheckInterface;
 use Stratum\DevHealthCheck\Model\Result\CheckResult;

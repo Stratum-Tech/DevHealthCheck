@@ -69,6 +69,6 @@ class WebRootCheck implements CheckInterface
             return CheckResult::ok(sprintf('document root correctly set to pub/'));
         }
 
-        return CheckResult::info('cannot verify from CLI — ensure web server document root is set to pub/');
+        return CheckResult::skip('document root not available from CLI');
     }
 }

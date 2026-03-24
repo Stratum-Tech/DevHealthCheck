@@ -56,6 +56,13 @@ class VarSizeCheck implements CheckInterface
 
     private function directorySize(string $path): int
     {
+        $output = shell_exec(sprintf('du -sk %s 2>/dev/null', escapeshellarg($path)));
+
+        if ($output !== null && preg_match('/^(\d+)/', $output, $matches)) {
+            return (int) $matches[1] * 1024;
+        }
+
+        // Fallback if shell_exec is unavailable
         $size     = 0;
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
