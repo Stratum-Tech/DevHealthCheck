@@ -6,6 +6,7 @@ namespace Stratum\DevHealthCheck\Console\Command;
 use Stratum\DevHealthCheck\Model\Enum\StatusEnum;
 use Stratum\DevHealthCheck\Model\HealthCheckRunner;
 use Stratum\DevHealthCheck\Model\Output\ConsoleRenderer;
+use Stratum\DevHealthCheck\Model\Score\ScoreCalculator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,6 +17,7 @@ class HealthCheckCommand extends Command
     public function __construct(
         private readonly HealthCheckRunner $runner,
         private readonly ConsoleRenderer $renderer,
+        private readonly ScoreCalculator $scoreCalculator,
     ) {
         parent::__construct();
     }
@@ -37,12 +39,14 @@ class HealthCheckCommand extends Command
 
         $sectionResults = $this->runner->run($section);
 
+        $scoreResult = $this->scoreCalculator->calculate($sectionResults);
+
         if ($format === 'json') {
-            $output->writeln($this->renderer->toJson($sectionResults));
+            $output->writeln($this->renderer->toJson($sectionResults, $scoreResult));
             return $this->resolveExitCode($sectionResults, $failOnWarn);
         }
 
-        $this->renderer->render($output, $sectionResults);
+        $this->renderer->render($output, $sectionResults, $scoreResult);
 
         return $this->resolveExitCode($sectionResults, $failOnWarn);
     }

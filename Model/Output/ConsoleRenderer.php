@@ -5,8 +5,7 @@ namespace Stratum\DevHealthCheck\Model\Output;
 
 use Stratum\DevHealthCheck\Model\Enum\StatusEnum;
 use Stratum\DevHealthCheck\Model\Result\SectionResult;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableStyle;
+use Stratum\DevHealthCheck\Model\Score\ScoreResult;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleRenderer
@@ -14,7 +13,7 @@ class ConsoleRenderer
     /**
      * @param SectionResult[] $sectionResults
      */
-    public function render(OutputInterface $output, array $sectionResults): void
+    public function render(OutputInterface $output, array $sectionResults, ?ScoreResult $scoreResult = null): void
     {
         $this->renderHeader($output);
 
@@ -45,16 +44,16 @@ class ConsoleRenderer
             }
         }
 
-        $this->renderSummary($output, $counts);
+        $this->renderSummary($output, $counts, $scoreResult);
     }
 
     /**
      * @param SectionResult[] $sectionResults
      */
-    public function toJson(array $sectionResults): string
+    public function toJson(array $sectionResults, ?ScoreResult $scoreResult = null): string
     {
         $sections = [];
-        $counts = [
+        $counts   = [
             'ok' => 0, 'warn' => 0, 'fail' => 0, 'info' => 0, 'skip' => 0,
         ];
 
@@ -73,7 +72,16 @@ class ConsoleRenderer
             $sections[$section->sectionName] = $items;
         }
 
-        return json_encode(['sections' => $sections, 'summary' => $counts], JSON_PRETTY_PRINT);
+        $payload = ['sections' => $sections, 'summary' => $counts];
+
+        if ($scoreResult !== null) {
+            $payload['score'] = [
+                'score' => $scoreResult->score,
+                'grade' => $scoreResult->grade,
+            ];
+        }
+
+        return json_encode($payload, JSON_PRETTY_PRINT);
     }
 
     private function renderHeader(OutputInterface $output): void
@@ -88,7 +96,7 @@ class ConsoleRenderer
         $output->writeln(sprintf('<options=bold>╚%s╝</>', $bar));
     }
 
-    private function renderSummary(OutputInterface $output, array $counts): void
+    private function renderSummary(OutputInterface $output, array $counts, ?ScoreResult $scoreResult): void
     {
         $line = str_repeat('─', 44);
         $output->writeln('');
@@ -101,6 +109,41 @@ class ConsoleRenderer
             $counts[StatusEnum::INFO->value],
             $counts[StatusEnum::SKIP->value],
         ));
+
+        if ($scoreResult !== null) {
+            $output->writeln(sprintf(
+                '  <options=bold>Score:</>     %s  <options=bold>Grade: %s</>',
+                $this->coloredScore($scoreResult->score),
+                $this->coloredGrade($scoreResult->grade),
+            ));
+        }
+
         $output->writeln($line);
+    }
+
+    private function coloredScore(int $score): string
+    {
+        $color = match(true) {
+            $score >= 90 => 'green',
+            $score >= 75 => 'green',
+            $score >= 60 => 'yellow',
+            $score >= 45 => 'yellow',
+            default      => 'red',
+        };
+
+        return sprintf('<fg=%s>%d/100</>', $color, $score);
+    }
+
+    private function coloredGrade(string $grade): string
+    {
+        $color = match($grade) {
+            'A'     => 'green',
+            'B'     => 'green',
+            'C'     => 'yellow',
+            'D'     => 'yellow',
+            default => 'red',
+        };
+
+        return sprintf('<fg=%s>%s</>', $color, $grade);
     }
 }
