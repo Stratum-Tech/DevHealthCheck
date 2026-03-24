@@ -81,6 +81,7 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="devHealthCheck" xsi:type="object">Stratum\DevHealthCheck\Console\Command\HealthCheckCommand</item>
+                <item name="devHealthCheckLogs" xsi:type="object">Stratum\DevHealthCheck\Console\Command\LogAnalyzeCommand</item>
             </argument>
         </arguments>
     </type>
