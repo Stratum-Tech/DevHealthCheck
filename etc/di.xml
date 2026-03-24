@@ -42,6 +42,37 @@
                 <!-- Search -->
                 <item name="searchConfig"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Search\SearchEngineConfigCheck</item>
                 <item name="searchConnect"     xsi:type="object">Stratum\DevHealthCheck\Model\Check\Search\SearchEngineConnectivityCheck</item>
+                <!-- Cron (extended) -->
+                <item name="cronStuck"         xsi:type="object">Stratum\DevHealthCheck\Model\Check\Cron\StuckCronJobsCheck</item>
+                <item name="cronDuplicates"    xsi:type="object">Stratum\DevHealthCheck\Model\Check\Cron\DuplicateCronScheduleCheck</item>
+                <!-- Security -->
+                <item name="gitDir"            xsi:type="object">Stratum\DevHealthCheck\Model\Check\Security\GitDirectoryCheck</item>
+                <item name="phpInfoFile"       xsi:type="object">Stratum\DevHealthCheck\Model\Check\Security\PhpInfoFileCheck</item>
+                <item name="twoFactorAuth"     xsi:type="object">Stratum\DevHealthCheck\Model\Check\Security\TwoFactorAuthCheck</item>
+                <item name="webRoot"           xsi:type="object">Stratum\DevHealthCheck\Model\Check\Security\WebRootCheck</item>
+                <item name="logDirExposure"    xsi:type="object">Stratum\DevHealthCheck\Model\Check\Security\LogDirectoryCheck</item>
+                <!-- Performance -->
+                <item name="minifyAssets"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Performance\MinifyAssetsCheck</item>
+                <item name="flatCatalog"       xsi:type="object">Stratum\DevHealthCheck\Model\Check\Performance\FlatCatalogCheck</item>
+                <item name="moduleCount"       xsi:type="object">Stratum\DevHealthCheck\Model\Check\Performance\ModuleCountCheck</item>
+                <item name="mysqlQueryCache"   xsi:type="object">Stratum\DevHealthCheck\Model\Check\Performance\MysqlQueryCacheCheck</item>
+                <item name="fullPageCache"     xsi:type="object">Stratum\DevHealthCheck\Model\Check\Performance\FullPageCacheCheck</item>
+                <!-- Logging -->
+                <item name="exceptionLog"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Logging\ExceptionLogCheck</item>
+                <item name="reportDir"         xsi:type="object">Stratum\DevHealthCheck\Model\Check\Logging\ReportDirectoryCheck</item>
+                <item name="logLevel"          xsi:type="object">Stratum\DevHealthCheck\Model\Check\Logging\LogLevelCheck</item>
+                <!-- Storage -->
+                <item name="mediaSize"         xsi:type="object">Stratum\DevHealthCheck\Model\Check\Storage\MediaSizeCheck</item>
+                <item name="varSize"           xsi:type="object">Stratum\DevHealthCheck\Model\Check\Storage\VarSizeCheck</item>
+                <!-- Config Integrity -->
+                <item name="configPhpSync"     xsi:type="object">Stratum\DevHealthCheck\Model\Check\Config\ConfigPhpSyncCheck</item>
+                <item name="storeCodeUrl"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Config\StoreCodeUrlCheck</item>
+                <!-- Extensions -->
+                <item name="rewriteCount"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Extensions\RewriteCountCheck</item>
+                <item name="duplicateModules"  xsi:type="object">Stratum\DevHealthCheck\Model\Check\Extensions\DuplicateModuleCheck</item>
+                <!-- Infrastructure -->
+                <item name="requireJs"         xsi:type="object">Stratum\DevHealthCheck\Model\Check\Infrastructure\RequireJsCheck</item>
+                <item name="sessionBackend"    xsi:type="object">Stratum\DevHealthCheck\Model\Check\Infrastructure\SessionBackendCheck</item>
             </argument>
         </arguments>
     </type>

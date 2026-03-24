@@ -48,13 +48,50 @@ A Magento 2 CLI module that runs a colour-coded, sectioned health check of your 
     ✓  Cron Last Run         last run 2 minutes ago
     ✓  Cron Error Jobs       no errors in last 60 minutes
     ✓  Cron Backlog          0 stale pending jobs
+    ✓  Stuck Cron Jobs       no stuck jobs detected
+    ✓  Duplicate Cron Entries no duplicate scheduled entries
 
 [Search]
     ✓  Search Engine         elasticsearch8
     ✓  Search Connectivity   connected to 127.0.0.1:9200 (elasticsearch8)
 
+[Security]
+    ✓  .git in Webroot       .git/ not inside pub/
+    ✓  PHP Info Files        no phpinfo files found in pub/
+    ✗  Two-Factor Auth       Magento_TwoFactorAuth is disabled
+    ℹ  Webroot Location      cannot verify from CLI — ensure document root is set to pub/
+    ✓  Log Dir Exposure      var/log and var/report outside pub/
+
+[Performance]
+    –  Asset Minification    minification check only relevant in production
+    ⚠  Flat Catalog          flat tables disabled for: products, categories
+    ✓  Module Count          142 enabled modules
+    ✓  MySQL Query Cache     query cache removed in MySQL 8 (no action needed)
+    ✓  Full Page Cache       Varnish
+
+[Logging]
+    ✓  Exception Log         0.1MB — last modified 142 minutes ago
+    ✓  Error Reports         0 error report files
+    –  Debug Logging         log level check only relevant in production
+
+[Storage]
+    ✓  Media Size            2.4GB
+    ✓  Var Directory Size    0.8GB
+
+[Config Integrity]
+    ✓  config.php Sync       all 142 modules accounted for
+    ✓  Store Code in URL     disabled
+
+[Extensions]
+    ✓  Class Rewrites        8 <preference> rewrites
+    ✓  Duplicate Modules     no identity conflicts between app/code/ and vendor/
+
+[Infrastructure]
+    ✓  RequireJS Config      24 RequireJS config file(s) deployed
+    ✓  Session Backend       Redis
+
 ────────────────────────────────────────────
-  Summary:  18 OK  |  3 WARN  |  0 FAIL  |  0 INFO  |  5 SKIP
+  Summary:  35 OK  |  4 WARN  |  1 FAIL  |  2 INFO  |  6 SKIP
 ────────────────────────────────────────────
 ```
 
@@ -86,7 +123,7 @@ bin/magento setup:upgrade
 bin/magento dev:healthcheck
 
 # Run a single section
-bin/magento dev:healthcheck --section="Cron"
+bin/magento dev:healthcheck --section="Security"
 
 # Show detail messages (verbose)
 bin/magento dev:healthcheck -v
@@ -136,8 +173,31 @@ bin/magento dev:healthcheck --fail-on-warn
 | Cron | Cron Last Run | FAIL if no successful job in last 15 minutes |
 | Cron | Cron Error Jobs | Counts error status jobs in last 60 minutes |
 | Cron | Cron Backlog | WARN >= 10 stale pending jobs, FAIL >= 50 |
+| Cron | Stuck Cron Jobs | FAIL if any job stuck in "running" state for > 30 minutes |
+| Cron | Duplicate Cron Entries | WARN if multiple pending entries for same job at same time |
 | Search | Search Engine | Reports configured engine; warns on deprecated MySQL search |
 | Search | Search Connectivity | HTTP connect to engine host:port with 2s timeout |
+| Security | .git in Webroot | FAIL if .git/ directory found inside pub/ |
+| Security | PHP Info Files | FAIL if info.php or phpinfo.php found in pub/ |
+| Security | Two-Factor Auth | FAIL if Magento_TwoFactorAuth disabled; WARN if no provider configured |
+| Security | Webroot Location | Verifies document root is pub/, not Magento root |
+| Security | Log Dir Exposure | Verifies var/log/ and var/report/ are outside pub/ |
+| Performance | Asset Minification | JS/CSS minification and merging enabled in production |
+| Performance | Flat Catalog | Flat product and category tables enabled |
+| Performance | Module Count | WARN >= 300 modules, FAIL >= 400 |
+| Performance | MySQL Query Cache | Warns if query_cache enabled (harmful under load) |
+| Performance | Full Page Cache | Varnish OK, built-in WARN in production, unconfigured FAIL |
+| Logging | Exception Log | WARN if recently modified or > 10MB; FAIL if > 50MB |
+| Logging | Error Reports | WARN >= 10 files in var/report/, FAIL >= 100 |
+| Logging | Debug Logging | Warns if dev/debug/debug_logging enabled in production |
+| Storage | Media Size | WARN >= 20GB, FAIL >= 50GB |
+| Storage | Var Directory Size | WARN >= 5GB, FAIL >= 20GB |
+| Config Integrity | config.php Sync | Detects modules registered but not yet in config.php |
+| Config Integrity | Store Code in URL | Warns if web/url/use_store enabled (breaks Varnish/CDN) |
+| Extensions | Class Rewrites | Counts `<preference>` entries across all di.xml; WARN >= 20, FAIL >= 50 |
+| Extensions | Duplicate Modules | FAIL if same module name exists in both app/code/ and vendor/ |
+| Infrastructure | RequireJS Config | FAIL if pub/static/_requirejs missing in production |
+| Infrastructure | Session Backend | WARN if using file-based sessions |
 
 ## Adding a custom check
 
@@ -156,4 +216,4 @@ bin/magento dev:healthcheck --fail-on-warn
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE)
