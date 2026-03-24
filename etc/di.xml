@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="Stratum\DevHealthCheck\Model\HealthCheckRunner">
+        <arguments>
+            <argument name="checks" xsi:type="array">
+                <!-- PHP -->
+                <item name="phpVersion"        xsi:type="object">Stratum\DevHealthCheck\Model\Check\Php\PhpVersionCheck</item>
+                <item name="phpExtensions"     xsi:type="object">Stratum\DevHealthCheck\Model\Check\Php\PhpExtensionsCheck</item>
+                <item name="opCache"           xsi:type="object">Stratum\DevHealthCheck\Model\Check\Php\OpCacheCheck</item>
+                <!-- Deploy & Mode -->
+                <item name="deployMode"        xsi:type="object">Stratum\DevHealthCheck\Model\Check\Deploy\DeployModeCheck</item>
+                <item name="maintenanceMode"   xsi:type="object">Stratum\DevHealthCheck\Model\Check\Deploy\MaintenanceModeCheck</item>
+                <item name="staticAssets"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Deploy\StaticAssetsCheck</item>
+                <item name="generatedDir"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Deploy\GeneratedDirectoryCheck</item>
+                <!-- Filesystem -->
+                <item name="writableDirs"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Filesystem\WritableDirectoriesCheck</item>
+                <item name="envPhpPerms"       xsi:type="object">Stratum\DevHealthCheck\Model\Check\Filesystem\EnvPhpPermissionsCheck</item>
+                <item name="diskSpace"         xsi:type="object">Stratum\DevHealthCheck\Model\Check\Filesystem\DiskSpaceCheck</item>
+                <!-- Database -->
+                <item name="dbConnection"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Database\DatabaseConnectionCheck</item>
+                <item name="dbVersion"         xsi:type="object">Stratum\DevHealthCheck\Model\Check\Database\DatabaseVersionCheck</item>
+                <item name="pendingUpgrade"    xsi:type="object">Stratum\DevHealthCheck\Model\Check\Database\PendingUpgradeCheck</item>
+                <!-- Cache -->
+                <item name="cacheStatus"       xsi:type="object">Stratum\DevHealthCheck\Model\Check\Cache\CacheStatusCheck</item>
+                <item name="cacheBackend"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Cache\CacheBackendCheck</item>
+                <item name="redisConnectivity" xsi:type="object">Stratum\DevHealthCheck\Model\Check\Cache\RedisConnectivityCheck</item>
+                <!-- Indexers -->
+                <item name="indexerStatus"     xsi:type="object">Stratum\DevHealthCheck\Model\Check\Indexer\IndexerStatusCheck</item>
+                <item name="indexerMode"       xsi:type="object">Stratum\DevHealthCheck\Model\Check\Indexer\IndexerModeCheck</item>
+                <!-- Environment -->
+                <item name="cryptKey"          xsi:type="object">Stratum\DevHealthCheck\Model\Check\Environment\CryptKeyCheck</item>
+                <item name="baseUrl"           xsi:type="object">Stratum\DevHealthCheck\Model\Check\Environment\BaseUrlCheck</item>
+                <item name="adminUrl"          xsi:type="object">Stratum\DevHealthCheck\Model\Check\Environment\AdminUrlCheck</item>
+                <item name="cookieConfig"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Environment\CookieConfigCheck</item>
+                <item name="httpsRedirect"     xsi:type="object">Stratum\DevHealthCheck\Model\Check\Environment\HttpsRedirectCheck</item>
+                <!-- Cron -->
+                <item name="cronLastRun"       xsi:type="object">Stratum\DevHealthCheck\Model\Check\Cron\CronLastRunCheck</item>
+                <item name="cronErrorJobs"     xsi:type="object">Stratum\DevHealthCheck\Model\Check\Cron\CronErrorJobsCheck</item>
+                <item name="cronBacklog"       xsi:type="object">Stratum\DevHealthCheck\Model\Check\Cron\CronBacklogCheck</item>
+                <!-- Search -->
+                <item name="searchConfig"      xsi:type="object">Stratum\DevHealthCheck\Model\Check\Search\SearchEngineConfigCheck</item>
+                <item name="searchConnect"     xsi:type="object">Stratum\DevHealthCheck\Model\Check\Search\SearchEngineConnectivityCheck</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="devHealthCheck" xsi:type="object">Stratum\DevHealthCheck\Console\Command\HealthCheckCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

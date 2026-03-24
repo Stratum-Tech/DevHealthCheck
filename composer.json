@@ -1,0 +1,20 @@
+{
+    "name": "stratum/module-dev-healthcheck",
+    "description": "CLI health check command for Magento 2 — environment, deployment, and configuration diagnostics",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "magento/framework": ">=107.0"
+    },
+    "autoload": {
+        "files": ["registration.php"],
+        "psr-4": {
+            "Stratum\\DevHealthCheck\\": ""
+        }
+    },
+    "extra": {
+        "map": [["*", "Stratum/DevHealthCheck"]]
+    }
+}
