@@ -20,7 +20,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Stratum\\DevHealthCheck\\Test\\": "Test/"
+            "Stratum\\DevHealthCheck\\Test\\": "Test/",
+            "Stratum\\DevHealthCheck\\Test\\Stub\\": "Test/Stub/"
         }
     },
     "repositories": [

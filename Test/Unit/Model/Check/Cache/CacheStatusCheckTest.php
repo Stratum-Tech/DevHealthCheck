@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Stratum\DevHealthCheck\Test\Unit\Model\Check\Cache;
 
-use Magento\Framework\App\Cache\Type\FrontendPool;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Stratum\DevHealthCheck\Model\Check\Cache\CacheStatusCheck;
 use Stratum\DevHealthCheck\Model\Enum\StatusEnum;
@@ -23,9 +22,10 @@ class CacheStatusCheckTest extends TestCase
 
     public function testOkWhenAllTypesEnabled(): void
     {
-        $type = $this->createMock(\Magento\Framework\Cache\Frontend\Decorator\TagScope::class);
-        $type->method('getStatus')->willReturn(1);
-        $type->method('getId')->willReturn('config');
+        $type = new class {
+            public function getStatus(): int { return 1; }
+            public function getId(): string { return 'config'; }
+        };
 
         $this->cacheTypeList->method('getTypes')->willReturn(['config' => $type]);
 
@@ -34,9 +34,10 @@ class CacheStatusCheckTest extends TestCase
 
     public function testWarnWhenTypeDisabled(): void
     {
-        $type = $this->createMock(\Magento\Framework\Cache\Frontend\Decorator\TagScope::class);
-        $type->method('getStatus')->willReturn(0);
-        $type->method('getId')->willReturn('block_html');
+        $type = new class {
+            public function getStatus(): int { return 0; }
+            public function getId(): string { return 'block_html'; }
+        };
 
         $this->cacheTypeList->method('getTypes')->willReturn(['block_html' => $type]);
 
