@@ -25,7 +25,7 @@ jobs:
           coverage: none
 
       - name: Configure Magento credentials
-        run: composer config http-basic.repo.magento.com ${{ secrets.MAGENTO_USERNAME }} ${{ secrets.MAGENTO_PASSWORD }}
+        run: composer config --global --auth http-basic.repo.magento.com ${{ secrets.MAGENTO_USERNAME }} ${{ secrets.MAGENTO_PASSWORD }}
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
