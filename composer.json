@@ -5,10 +5,12 @@
     "license": "MIT",
     "require": {
         "php": ">=8.2",
-        "magento/framework": ">=107.0"
+        "magento/framework": ">=103.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.0"
+        "phpunit/phpunit": "^11.0",
+        "magento/module-store": "*",
+        "magento/module-indexer": "*"
     },
     "autoload": {
         "files": ["registration.php"],
@@ -18,7 +20,19 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Stratum\\DevHealthCheck\\Test\\": "Test/"
+            "Stratum\\DevHealthCheck\\Test\\": "Test/",
+            "Stratum\\DevHealthCheck\\Test\\Stub\\": "Test/Stub/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "magento/composer-dependency-version-audit-plugin": false
         }
     },
     "extra": {
