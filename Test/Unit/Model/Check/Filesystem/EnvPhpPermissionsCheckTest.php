@@ -31,13 +31,6 @@ class EnvPhpPermissionsCheckTest extends TestCase
 
     public function testWarnOnWorldReadableFile(): void
     {
-        $tmpFile = tempnam(sys_get_temp_dir(), 'env_php_test_');
-        chmod($tmpFile, 0644); // world-readable
-
-        $this->directoryList->method('getRoot')->willReturn(dirname($tmpFile));
-
-        // Manually test the perms logic by using the actual file path indirectly
-        // We test by pointing root to a directory where app/etc/env.php = our tmp file
         $tmpDir = sys_get_temp_dir() . '/osc_test_' . uniqid();
         mkdir($tmpDir . '/app/etc', 0755, true);
         $envFile = $tmpDir . '/app/etc/env.php';
@@ -54,7 +47,6 @@ class EnvPhpPermissionsCheckTest extends TestCase
         rmdir($tmpDir . '/app/etc');
         rmdir($tmpDir . '/app');
         rmdir($tmpDir);
-        unlink($tmpFile);
     }
 
     public function testOkOnRestrictedFile(): void
