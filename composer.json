@@ -1,5 +1,5 @@
 {
-    "name": "stratum/module-dev-healthcheck",
+    "name": "stratum-tech/module-dev-healthcheck",
     "description": "CLI health check command for Magento 2 — environment, deployment, and configuration diagnostics",
     "type": "magento2-module",
     "license": "MIT",

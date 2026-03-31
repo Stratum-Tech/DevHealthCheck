@@ -105,7 +105,7 @@ A Magento 2 CLI module that runs a colour-coded, sectioned health check of your 
 
 **Via Composer:**
 ```bash
-composer require stratum/module-dev-healthcheck
+composer require stratum-tech/module-dev-healthcheck
 bin/magento module:enable Stratum_DevHealthCheck
 bin/magento setup:upgrade
 ```
