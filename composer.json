@@ -21,6 +21,12 @@
             "Stratum\\DevHealthCheck\\Test\\": "Test/"
         }
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    ],
     "extra": {
         "map": [["*", "Stratum/DevHealthCheck"]]
     }
